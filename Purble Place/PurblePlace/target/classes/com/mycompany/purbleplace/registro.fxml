@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="543.0" prefWidth="928.0" styleClass="pane4" stylesheets="@css/estilos.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.purbleplace.RegistroController">
+   <children>
+      <Button fx:id="volver" layoutX="608.0" layoutY="416.0" mnemonicParsing="false" onMouseClicked="#volverAInicio" prefHeight="76.0" prefWidth="200.0" styleClass="button2" text="VOLVER" />
+      <Button fx:id="registrarse" layoutX="573.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#volverAInicio" styleClass="button2" text="REGISTRARSE" />
+      <TextField layoutX="506.0" layoutY="104.0" prefHeight="47.0" prefWidth="450.0" promptText="Ingrese sus dos apellidos completos" />
+      <TextField layoutX="506.0" layoutY="40.0" prefHeight="47.0" prefWidth="450.0" promptText="Ingrese sus dos nombres completos" />
+      <TextField layoutX="506.0" layoutY="168.0" prefHeight="47.0" prefWidth="450.0" promptText="Ingrese un nombre de Usuario" />
+      <TextField layoutX="506.0" layoutY="224.0" prefHeight="47.0" prefWidth="450.0" promptText="Ingrese una contraseña" />
+      <TextField layoutX="506.0" layoutY="288.0" prefHeight="47.0" prefWidth="450.0" promptText="Ingrese un correo válido" />
+   </children>
+</AnchorPane>

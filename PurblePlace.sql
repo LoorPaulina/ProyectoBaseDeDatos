@@ -1,5 +1,6 @@
+drop database PurblePlace;
 
-/**USE PurblePlace;
+USE PurblePlace;
 drop table if exists USUARIO;
 CREATE TABLE USUARIO
 (
@@ -14,9 +15,7 @@ drop table if exists proovedor;
 create table proovedor(
 ruc varchar(10) primary key not null,
 nombre varchar(50),
-telefono varchar(10),
-
-
+telefono varchar(10)
 );
 drop table if exists materiaPrima;
 create table materiaPrima (
@@ -50,29 +49,30 @@ idReceta int not null,
 cantidadNecesaria double not null,
 constraint c4 foreign key (idMateriaPrima) references materiaPrima(Codigo),
 constraint c5 foreign key (idReceta) references receta(codigo)
-);**/
+);
 
-/**insert into usuario (nombres, apellidos, nombre_Usuario,correo,clave) values 
-("Gisella","Perez","Gperez","gisella@hotmail.com","G12345");**/
+insert into usuario (nombres, apellidos, nombre_Usuario,correo,clave) values 
+("Gisella","Perez","Gperez","gisella@hotmail.com","G12345");
 
-/**insert into proovedor(ruc,nombre,telefono) values 
+insert into proovedor(ruc,nombre,telefono) values 
 ("0952959484","Industrias Trigo S.A","0981383239"),
 ("0981383239","Inalecsa S.A","0952959484"),
-("0914463815","Megamaxi S.A","0981383239");**/
-/**insert into materiaprima (nombreProducto,unidadesMedida) values
+("0914463815","Megamaxi S.A","0981383239");
+
+insert into materiaprima (nombreProducto,unidadesMedida) values
 ("chocolate blanco","kg"),
 ("chocolate negro","kg"),
 ("harina de trigo","kg"),
 ("cafe","kg"),
-("manjar","kg");**/
+("manjar","kg");
 select *
 from proovedor_materia_prima;
 /**trigger para que calcule el costo unitario despues de un ingreso**/
-/**drop trigger if exists inProovedorMateria;
+drop trigger if exists inProovedorMateria;
 create trigger inProovedorMateria before insert on proovedor_materia_prima for each row
 set new.costo_unitario_producto = new.costoxProovedor/new.unidadesRecibidas;
-**/
-/**insert into proovedor_materia_prima(codigo_materiaPrima,codigo_Proovedor,costoxProovedor,fechaCaducidad,unidadesRecibidas)
+
+insert into proovedor_materia_prima(codigo_materiaPrima,codigo_Proovedor,costoxProovedor,fechaCaducidad,unidadesRecibidas)
 values(3,"0952959484",100,"2023-02-02",20);*//
 /*(4,"0981383239",100,"2023-02-02",18),
 (5,"0914463815",150,"2023-04-02",15),

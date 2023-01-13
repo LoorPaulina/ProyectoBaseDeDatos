@@ -109,7 +109,45 @@ start transaction;
 	
 end
 //
+/**view que me muestra solo los productos que no estan caducados*/
+drop view if exists materiaActual;
+create view materiaActual as 
+select pmp.codigo,pmp.codigo_materiaPrima,m.nombreProducto,m.unidadesMedida,pmp.codigo_Proovedor,p.nombre,pmp.costo_unitario_producto from proovedor_materia_prima as pmp inner join materiaprima as m on 
+m.codigo=pmp.codigo_materiaPrima 
+inner join proovedor as p on p.ruc=pmp.codigo_Proovedor where pmp.fechaCaducidad > current_date(); 
+select * from materiaActual;
+
 delimiter ;
 select * from usuario;
 call almacenadoLogIn("Gperez","G1234",@logeado);
 select @logeado;
+drop procedure if exists calculoCostoPromedio;
+delimiter //
+create procedure calculoCostoPromedio(in nombrePro varchar(100), in codigoProd int, out costo double ) 
+begin
+declare exito int;
+
+start transaction;
+set exito=0;
+set costo=(select avg(ma.costo_unitario_producto) from materiaActual as ma where ma.codigo_materiaPrima=codigoProd and ma.nombreProducto=nombrePro );
+set exito=1;
+if exito=0 then
+rollback;
+else 
+commit;
+end if;
+end
+//
+delimiter ;
+drop procedure if exists tablaMateria;
+delimiter //
+create procedure tablaMateria()
+begin 
+start transaction;
+select codigo,nombreProducto, unidadesMedida from materiaprima;
+end
+//
+delimiter ;
+
+call tablaMateria();
+

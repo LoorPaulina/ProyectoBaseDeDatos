@@ -36,6 +36,8 @@ unidadesRecibidas double,
 constraint c2 foreign key (codigo_materiaPrima) references materiaPrima(codigo),
 constraint c3 foreign key (codigo_Proovedor) references proovedor (ruc)
 );
+ALTER TABLE proovedor_materia_prima
+ADD costo_unitario_producto double ;
 create table receta (
 codigo int not null primary key auto_increment,
 nombre varchar(50),
@@ -112,7 +114,7 @@ end
 /**view que me muestra solo los productos que no estan caducados*/
 drop view if exists materiaActual;
 create view materiaActual as 
-select pmp.codigo,pmp.codigo_materiaPrima,m.nombreProducto,m.unidadesMedida,pmp.codigo_Proovedor,p.nombre,pmp.costo_unitario_producto from proovedor_materia_prima as pmp inner join materiaprima as m on 
+select pmp.codigo,pmp.codigo_materiaPrima,m.nombreProducto,m.unidadesMedida,pmp.unidadesRecibidas,pmp.codigo_Proovedor,p.nombre,pmp.costo_unitario_producto from proovedor_materia_prima as pmp inner join materiaprima as m on 
 m.codigo=pmp.codigo_materiaPrima 
 inner join proovedor as p on p.ruc=pmp.codigo_Proovedor where pmp.fechaCaducidad > current_date(); 
 select * from materiaActual;
@@ -148,6 +150,54 @@ select codigo,nombreProducto, unidadesMedida from materiaprima;
 end
 //
 delimiter ;
+call calculoCostoPromedio("harina de trigo",3,@resultado);
 
+select @resultado;
 call tablaMateria();
+select * from materiaActual;
+delimiter //
+create procedure calculoStockVigenteProducto( in codProducto int, in nomProducto varchar(100), out numero double)
+begin 
+start transaction;
+set numero=(select sum(ma.unidadesRecibidas) from materiaActual as ma where ma.codigo_materiaPrima=codProducto and ma.nombreProducto=nomProducto );
+end
+//
+delimiter ;
+/*vista que me muestra los productos caducados*/
+create view materiaCaducada as 
+select pmp.codigo,pmp.codigo_materiaPrima,m.nombreProducto,m.unidadesMedida,pmp.unidadesRecibidas,pmp.codigo_Proovedor,p.nombre,pmp.costo_unitario_producto from proovedor_materia_prima as pmp inner join materiaprima as m on 
+m.codigo=pmp.codigo_materiaPrima 
+inner join proovedor as p on p.ruc=pmp.codigo_Proovedor where pmp.fechaCaducidad < current_date(); 
+select * from materiaCaducada;
+/* procedimiento que calcula el total de productos caducados*/
+delimiter //
+create procedure calculoStockCaducadoProducto( in codProducto int, in nomProducto varchar(100), out numero double)
+begin 
+start transaction;
+set numero=(select sum(ma.unidadesRecibidas) from materiaCaducada as ma where ma.codigo_materiaPrima=codProducto and ma.nombreProducto=nomProducto );
+end
+//
+delimiter ;
+call calculoStockCaducadoProducto(1,"chocolate blanco",@total );
+select @total;
+/*almacenado que verfica el correo de un usuario*/
+drop procedure if exists verificarCorreo;
+delimiter //
+create procedure verificarCorreo( in nomuser varchar(100), in usercorreo varchar(100), out estado boolean )
+begin 
+declare correoUsuario varchar(100);
+start transaction;
+set correoUsuario=(select correo from usuario where usuario.nombre_Usuario=nomUser);
+if correoUsuario=usercorreo then
+set estado=true;
+commit;
+else 
+set estado=false;
+rollback;
+end if;
+end
+//
+delimiter ;
 
+call verificarCorreo("Gperez","gisella@hotmail.com",@es);
+select @es;

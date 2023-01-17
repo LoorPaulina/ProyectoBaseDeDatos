@@ -1,4 +1,3 @@
-drop database PurblePlace;
 
 USE PurblePlace;
 drop table if exists USUARIO;
@@ -201,3 +200,75 @@ delimiter ;
 
 call verificarCorreo("Gperez","gisella@hotmail.com",@es);
 select @es;
+select * from proovedor;
+select * from materiaPrima;
+select * from receta;
+select * from materiprima_receta;
+insert into materiaprima(nombreProducto,unidadesMedida) values("leche","ml"),
+("huevo","U"),
+("mantequilla","kg"),
+("azucar","kg"),
+("crema pastelera","kg");
+select * from proovedor;
+insert into proovedor_materia_prima(codigo_materiaPrima,codigo_Proovedor,costoxProovedor,fechaCaducidad,unidadesRecibidas) values 
+(16,"0914463815",50,"2023-01-02",20),
+(20,"0981383239",45,"2023-04-02",40),
+(18,"0981383239",450,"2023-01-28",40),
+(17,"0952959484",200,"2023-04-20",150),
+(19,"0952959484",20,"2023-03-02",30),
+(19,"0914463815",100,"2023-04-15",55);
+
+
+insert into receta(nombre,descripcion,numPorciones) values 
+("bizcocho de vainilla","bizcocho de vainilla",8),
+("pie de limon","pie de limon",10),
+("torta mojada de chocolate","torta mojada de chocolate",5),
+("relleno de manjar","relleno para tortas",4);
+
+
+delimiter //
+create procedure mostrarRecetas(  )
+begin 
+select * from receta;
+end
+//
+delimiter ;
+
+call mostrarRecetas();
+select * from receta;
+select * from materiprima_receta;
+select * from materiaprima;
+insert into materiprima_receta(idMateriaPrima,idReceta,cantidadNecesaria) values(3,4,0.5),
+(16,4,1.5),
+(17,4,3),
+(19,4,0.5),
+(20,4,1);
+drop procedure if exists ingredientesxReceta;
+delimiter //
+create procedure ingredientesxReceta( in nombreReceta varchar(100),out mensaje varchar(100))
+begin 
+declare exito int;
+declare id int;
+start transaction;
+set exito=0;
+set id=(select codigo from receta where receta.nombre=nombreReceta);
+if id is null then 
+set exito=0;
+set mensaje="el codigo no existe";
+else 
+set exito=1;
+select mp.nombreProducto as ingrediente,mpr.cantidadNecesaria as cantidad from materiprima_receta as mpr inner join receta as r on mpr.idReceta=r.codigo inner join materiaprima as mp on mpr.idMateriaPrima=mp.codigo; 
+set mensaje="muestra los ingredientes de la receta ingresada";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+//
+delimiter ;
+call ingredientesxReceta("pie de limon",@resultado);
+select @resultado;
+call ingredientesxReceta("a",@resultado);
+select @resultado;

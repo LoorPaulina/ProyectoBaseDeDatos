@@ -367,4 +367,61 @@ end
 delimiter ;
 select * from usuario;
 call IngresarUsuario( "Mariana","Peresz","Mperez", "correo@hotmail.com", "pass",@m);
+drop procedure if exists IngresarMateriaPrima;
+delimiter //
+create procedure IngresarMateriaPrima( in nombremateria varchar(100),unidades varchar(20),out mensaje varchar(100))
+begin 
+declare exito int;
+declare idmateria int;
+start transaction;
+set idmateria=(select codigo from materiaprima where nombreProducto=nombremateria);
+if idmateria is null then 
+set exito=1;
+set mensaje= "se realizo el ingreso";
+insert into materiaprima(nombreProducto,unidadesMedida) values (nombremateria,unidades);
+else 
+set exito=0;
+set mensaje="la materia prima ya existe";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+//
+
+delimiter ;
+select * from materiaprima;
+select * from proovedor;
+select * from proovedor_materia_prima;
+
+call IngresarMateriaPrima( "semillas", "Kg",@m);
+select @m;
+delimiter //
+create procedure IngresarProovedor( in codi varchar(12),in nombreproo varchar(100),telefono varchar(10),out mensaje varchar(100))
+begin 
+declare exito int;
+declare idproovedor varchar(20);
+start transaction;
+set exito=0;
+set idproovedor=(select ruc from proovedor where nombre=nombreproo);
+if idproovedor is null then 
+insert into proovedor(ruc,nombre,telefono) values(codi,nombreproo,telefono);
+set exito=1;
+set mensaje="ingreso exitoso";
+else
+set exito=0;
+set mensaje="el proovedor ya esta ingresado";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+//
+SELECT * FROM proovedor;
+delimiter ;
+call IngresarProovedor("0945879001","La Fabril S.A","0945862589",@m);
 select @m;

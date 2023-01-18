@@ -285,3 +285,56 @@ select @resultado;
 call ingredientesxReceta("a",@resultado);
 select @resultado;
 select * from materiaprima;
+delimiter //
+create procedure eliminarIngrediente( in nombreIngrediente varchar(100),out mensaje varchar(100))
+begin 
+declare exito int;
+declare id int;
+set exito=0;
+start transaction;
+set id=(select codigo from materiaprima where nombreProducto=nombreIngrediente );
+if id is not null then 
+delete from materiaprima as mp where mp.codigo=id;
+set exito=1;
+else
+set exito=0;
+end if;
+if exito=1 then 
+set mensaje="se borro el registro";
+commit;
+else 
+set mensaje="no se borro";
+rollback;
+end if;
+end
+//
+
+delimiter ;
+ALTER TABLE materiprima_receta  ADD  CONSTRAINT c12 FOREIGN KEY (idMateriaPrima)
+REFERENCES materiaprima(codigo)
+ON DELETE CASCADE;
+ALTER TABLE materiprima_receta  ADD  CONSTRAINT c13 FOREIGN KEY (idMateriaPrima)
+REFERENCES materiaprima(codigo)
+ON UPDATE CASCADE;
+ALTER TABLE proovedor_materia_prima  ADD  CONSTRAINT c14 FOREIGN KEY (codigo_materiaPrima)
+REFERENCES materiaprima(codigo)
+ON DELETE CASCADE;
+ALTER TABLE proovedor_materia_prima  ADD  CONSTRAINT c15 FOREIGN KEY (codigo_materiaPrima)
+REFERENCES materiaprima(codigo)
+ON UPDATE CASCADE;
+ALTER TABLE proovedor_materia_prima  ADD  CONSTRAINT c16 FOREIGN KEY (codigo_Proovedor)
+REFERENCES proovedor(ruc)
+ON DELETE CASCADE;
+ALTER TABLE proovedor_materia_prima  ADD  CONSTRAINT c17 FOREIGN KEY (codigo_Proovedor)
+REFERENCES proovedor(ruc)
+ON UPDATE CASCADE;
+ALTER TABLE materiprima_receta  ADD  CONSTRAINT c18 FOREIGN KEY (idReceta)
+REFERENCES receta(codigo)
+ON DELETE CASCADE;
+ALTER TABLE materiprima_receta  ADD  CONSTRAINT c10 FOREIGN KEY (idReceta)
+REFERENCES receta(codigo)
+ON UPDATE CASCADE;
+select * from proovedor_materia_prima;
+select * from materiaprima;
+call eliminarIngrediente( "azucar",@mensaje);
+select @mensaje; 

@@ -425,3 +425,78 @@ SELECT * FROM proovedor;
 delimiter ;
 call IngresarProovedor("0945879001","La Fabril S.A","0945862589",@m);
 select @m;
+delimiter //
+create function verificarMateriaP (nomproducto varchar(50))
+returns boolean
+READS SQL DATA
+DETERMINISTIC
+begin
+declare idprod int;
+declare exito boolean;
+set idprod=(select codigo from materiaprima where nombreProducto=nomproducto );
+if idprod is null then 
+set exito=false;
+else 
+set exito=true;
+end if;
+return exito;
+end//
+delimiter ;
+drop function if exists verificarProov;
+delimiter //
+create function verificarProov (nomproveedor varchar(50))
+returns boolean
+READS SQL DATA
+DETERMINISTIC
+begin
+declare idproo varchar(50);
+declare exito boolean;
+set idproo=(select ruc from proovedor where nombre=nomproveedor );
+if idproo is null then 
+set exito=false;
+else 
+set exito=true;
+end if;
+return exito;
+end//
+delimiter ;
+select * from materiaprima;
+select * from proovedor;
+select verificarMateriaP ("harina ");
+select verificarProov("Inalecsa");
+
+delimiter //
+create procedure IngresoMateriaPrimaProo( in nomMp varchar(50),in nomProo varchar(100),in totalF double, in fechaC date, in uRecibidas int ,out mensaje varchar(100))
+begin 
+declare exito int;
+declare idmateria int;
+declare idproov varchar(50);
+declare existemateria boolean;
+declare existeproov boolean;
+start transaction;
+set exito=0;
+set existemateria= verificarMateriaP(nomMp);
+set existeproov= verificarProov(nomProo);
+if existemateria is true and existeproov is true then 
+set idmateria=(select codigo from materiaprima where nombreProducto=nomMp);
+set idproov=(select ruc from proovedor  where nombre=nomProo);
+set exito=1;
+set mensaje="se inserto";
+insert into proovedor_materia_prima(codigo_materiaPrima,codigo_Proovedor,costoxProovedor,fechaCaducidad,unidadesRecibidas) values
+(idmateria,idproov,totalF,fechaC,uRecibidas);
+else 
+set exito=0;
+set mensaje="no se pudo hacer la insercion";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+
+//
+select * from proovedor;
+call IngresoMateriaPrimaProo( "leche","Inalecsa S.A",20,"2023-01-25", 15 ,@m);
+select @m;
+select * from proovedor_materia_prima;

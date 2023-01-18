@@ -117,21 +117,27 @@ select pmp.codigo,pmp.codigo_materiaPrima,m.nombreProducto,m.unidadesMedida,pmp.
 m.codigo=pmp.codigo_materiaPrima 
 inner join proovedor as p on p.ruc=pmp.codigo_Proovedor where pmp.fechaCaducidad > current_date(); 
 select * from materiaActual;
-
+select * from proovedor_materia_prima;
+select* from materiaPrima;
 delimiter ;
 select * from usuario;
 call almacenadoLogIn("Gperez","G1234",@logeado);
 select @logeado;
 drop procedure if exists calculoCostoPromedio;
+select * from materiaActual;
+drop procedure if exists calculoCostoPromedio;
 delimiter //
-create procedure calculoCostoPromedio(in nombrePro varchar(100), in codigoProd int, out costo double ) 
+create procedure calculoCostoPromedio(in nombrePro varchar(100), out costo double ) 
 begin
 declare exito int;
-
+declare id int;
 start transaction;
+set id=(select m.codigo from materiaprima  as m where m.nombreProducto=nombrePro );
 set exito=0;
-set costo=(select avg(ma.costo_unitario_producto) from materiaActual as ma where ma.codigo_materiaPrima=codigoProd and ma.nombreProducto=nombrePro );
+if id is not null then 
+set costo=(select avg(ma.costo_unitario_producto) from materiaActual as ma where ma.codigo_materiaPrima=id and ma.nombreProducto=nombrePro );
 set exito=1;
+end if;
 if exito=0 then
 rollback;
 else 
@@ -140,6 +146,8 @@ end if;
 end
 //
 delimiter ;
+call calculoCostoPromedio("mantequilla",@a);
+select @a;
 drop procedure if exists tablaMateria;
 delimiter //
 create procedure tablaMateria()
@@ -150,7 +158,7 @@ end
 //
 delimiter ;
 call calculoCostoPromedio("harina de trigo",3,@resultado);
-
+select avg(ma.costo_unitario_producto) from materiaActual as ma where ma.codigo_materiaPrima=18 and ma.nombreProducto="mantequilla";
 select @resultado;
 call tablaMateria();
 select * from materiaActual;
@@ -224,7 +232,7 @@ insert into receta(nombre,descripcion,numPorciones) values
 ("pie de limon","pie de limon",10),
 ("torta mojada de chocolate","torta mojada de chocolate",5),
 ("relleno de manjar","relleno para tortas",4);
-
+call calculoCostoPromedio();
 
 delimiter //
 create procedure mostrarRecetas(  )
@@ -257,7 +265,7 @@ set exito=0;
 set mensaje="el codigo no existe";
 else 
 set exito=1;
-select mp.nombreProducto as ingrediente,mpr.cantidadNecesaria as cantidad from materiprima_receta as mpr inner join receta as r on mpr.idReceta=r.codigo inner join materiaprima as mp on mpr.idMateriaPrima=mp.codigo; 
+select mp.nombreProducto as nombre, mpr.cantidadNecesaria as cantidad from materiprima_receta as mpr inner join receta as r on mpr.idReceta=r.codigo inner join materiaprima as mp on mpr.idMateriaPrima=mp.codigo where r.codigo=id; 
 set mensaje="muestra los ingredientes de la receta ingresada";
 end if;
 if exito=1 then
@@ -267,8 +275,13 @@ rollback;
 end if;
 end
 //
+
 delimiter ;
-call ingredientesxReceta("pie de limon",@resultado);
+select * from receta;
+call calculoCostoPromedio("leche",16,@resultado);
+select @resultado;
+call ingredientesxReceta("torta mojada de chocolate",@resultado);
 select @resultado;
 call ingredientesxReceta("a",@resultado);
 select @resultado;
+select * from materiaprima;

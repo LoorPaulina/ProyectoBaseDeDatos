@@ -338,3 +338,33 @@ select * from proovedor_materia_prima;
 select * from materiaprima;
 call eliminarIngrediente( "azucar",@mensaje);
 select @mensaje; 
+drop procedure if exists IngresarUsuario;
+delimiter //
+create procedure IngresarUsuario( in nom varchar(100),in ap varchar(100),nomuser varchar(100), mail varchar(100), pass varchar(100),out mensaje varchar(100))
+begin 
+declare exito int;
+declare id int;
+start transaction;
+set exito=0;
+set id=(select codigo from usuario where nombre_Usuario=nomuser);
+if id is null then 
+insert into usuario (nombres,apellidos,nombre_Usuario,correo,clave) values 
+(nom,ap,nomuser,mail,pass);
+set exito=1;
+set mensaje="se creo nuevo usuario";
+else 
+set exito=0;
+set mensaje="el usuario ya existe";
+end if;
+if exito=1 then
+commit;
+else 
+rollback;
+end if;
+end
+//
+
+delimiter ;
+select * from usuario;
+call IngresarUsuario( "Mariana","Peresz","Mperez", "correo@hotmail.com", "pass",@m);
+select @m;

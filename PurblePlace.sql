@@ -464,9 +464,9 @@ select * from materiaprima;
 select * from proovedor;
 select verificarMateriaP ("harina ");
 select verificarProov("Inalecsa");
-
+drop procedure if exists IngresoMateriaPrimaProo;
 delimiter //
-create procedure IngresoMateriaPrimaProo( in nomMp varchar(50),in nomProo varchar(100),in totalF double, in fechaC date, in uRecibidas int ,out mensaje varchar(100))
+create procedure IngresoMateriaPrimaProo( in nomMp varchar(50),in unidadesMed varchar(50),in nomProo varchar(100),in rucproo varchar(50), in telproo varchar(120),in totalF double, in fechaC date, in uRecibidas int ,out mensaje varchar(100))
 begin 
 declare exito int;
 declare idmateria int;
@@ -485,8 +485,18 @@ set mensaje="se inserto";
 insert into proovedor_materia_prima(codigo_materiaPrima,codigo_Proovedor,costoxProovedor,fechaCaducidad,unidadesRecibidas) values
 (idmateria,idproov,totalF,fechaC,uRecibidas);
 else 
-set exito=0;
-set mensaje="no se pudo hacer la insercion";
+if idmateria is null then 
+call IngresarMateriaPrima(nomMp,unidadesMed,@s);
+set idmateria=(select codigo from materiaprima where nombreProducto=nomMp);
+end if;
+if idproov is null then 
+call IngresarProovedor( rucproo,nomProo,telproo,@l);
+set idproov=(select ruc from proovedor  where nombre=nomProo);
+end if;
+insert into proovedor_materia_prima(codigo_materiaPrima,codigo_Proovedor,costoxProovedor,fechaCaducidad,unidadesRecibidas) values
+(idmateria,idproov,totalF,fechaC,uRecibidas);
+set exito=1;
+set mensaje="se hicieron ingreso nuevos en las tablas relacionadas";
 end if;
 if exito=1 then
 commit;
@@ -497,6 +507,7 @@ end
 
 //
 select * from proovedor;
-call IngresoMateriaPrimaProo( "leche","Inalecsa S.A",20,"2023-01-25", 15 ,@m);
+select * from materiaprima;
+call IngresoMateriaPrimaProo("leche condensada","lt","Nestle S.A","0987563214", "0845824598",200, "2023-08-02",20 ,@m);
 select @m;
 select * from proovedor_materia_prima;

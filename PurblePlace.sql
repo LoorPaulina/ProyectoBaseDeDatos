@@ -157,11 +157,6 @@ select codigo,nombreProducto, unidadesMedida from materiaprima;
 end
 //
 delimiter ;
-call calculoCostoPromedio("harina de trigo",3,@resultado);
-select avg(ma.costo_unitario_producto) from materiaActual as ma where ma.codigo_materiaPrima=18 and ma.nombreProducto="mantequilla";
-select @resultado;
-call tablaMateria();
-select * from materiaActual;
 delimiter //
 create procedure calculoStockVigenteProducto( in codProducto int, in nomProducto varchar(100), out numero double)
 begin 
@@ -277,14 +272,7 @@ end
 //
 
 delimiter ;
-select * from receta;
-call calculoCostoPromedio("leche",16,@resultado);
-select @resultado;
-call ingredientesxReceta("torta mojada de chocolate",@resultado);
-select @resultado;
-call ingredientesxReceta("a",@resultado);
-select @resultado;
-select * from materiaprima;
+
 delimiter //
 create procedure eliminarIngrediente( in nombreIngrediente varchar(100),out mensaje varchar(100))
 begin 
@@ -334,10 +322,7 @@ ON DELETE CASCADE;
 ALTER TABLE materiprima_receta  ADD  CONSTRAINT c10 FOREIGN KEY (idReceta)
 REFERENCES receta(codigo)
 ON UPDATE CASCADE;
-select * from proovedor_materia_prima;
-select * from materiaprima;
-call eliminarIngrediente( "azucar",@mensaje);
-select @mensaje; 
+
 drop procedure if exists IngresarUsuario;
 delimiter //
 create procedure IngresarUsuario( in nom varchar(100),in ap varchar(100),nomuser varchar(100), mail varchar(100), pass varchar(100),out mensaje varchar(100))

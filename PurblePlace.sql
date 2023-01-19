@@ -573,3 +573,34 @@ select * from receta;
 select * from materiprima_receta;
 call EliminarReceta( "torta mojada de chocolate",@m);
 select @m;
+drop procedure if exists IngresarIngredienteReceta;
+delimiter //
+create procedure IngresarIngredienteReceta( in nomMP varchar(50),in nomReceta varchar(50), in cantidadN double,out mensaje varchar(100))
+begin 
+declare exito int;
+declare idreceta int;
+declare idIng int;
+start transaction;
+set exito=0;
+set idreceta=(select codigo from receta where nombre=nomReceta);
+set idIng=(select codigo from materiaprima where nombreProducto=nomMP);
+if idreceta is not null and idIng is not null then 
+insert into materiprima_receta(idMateriaPrima,idReceta,cantidadNecesaria) values
+(idIng,idreceta,cantidadN);
+set exito=1;
+set mensaje="se ingreso de manera exitosa";
+else 
+set exito=0;
+set mensaje="asegurese de que la receta y el ingrediente esten ingresados ";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+
+//
+call IngresarIngredienteReceta( "mantequilla","pie de limon",0.5,@m);
+select @m;
+select * from materiprima_receta;

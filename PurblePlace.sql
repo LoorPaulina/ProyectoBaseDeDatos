@@ -508,6 +508,39 @@ end
 //
 select * from proovedor;
 select * from materiaprima;
-call IngresoMateriaPrimaProo("leche condensada","lt","Nestle S.A","0987563214", "0845824598",200, "2023-08-02",20 ,@m);
+call IngresoMateriaPrimaProo("leche evaporada","lt","Nestle S.A","0987563214", "0845824598",25, "2023-08-02",20 ,@m);
 select @m;
 select * from proovedor_materia_prima;
+delimiter //
+create procedure IngresoReceta( in nom varchar(50),in des varchar(100),in numP int,out mensaje varchar(100))
+begin 
+declare exito int;
+declare idreceta int;
+start transaction;
+set exito=0;
+set idreceta=(select codigo from receta where nombre=nom);
+if idreceta is null then 
+insert into receta(nombre,descripcion,numPorciones) values 
+(nom,des,numP);
+set exito=1;
+set mensaje="ingreso una nueva receta";
+else 
+set exito="0";
+set mensaje="la receta ya existe";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+
+//
+select * from proovedor_materia_prima;
+select * from materiaprima;
+select * from materiaactual;
+call calculoCostoPromedio("leche evaporada",@a);
+select @a;
+call IngresoReceta("pie de fresas","pie",8,@mensaje);
+select @mensaje;
+select * from receta;

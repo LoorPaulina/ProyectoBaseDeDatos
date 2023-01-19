@@ -544,3 +544,32 @@ select @a;
 call IngresoReceta("pie de fresas","pie",8,@mensaje);
 select @mensaje;
 select * from receta;
+drop procedure if exists EliminarReceta;
+delimiter //
+create procedure EliminarReceta( in nom varchar(50),out mensaje varchar(100))
+begin 
+declare exito int;
+declare idreceta int;
+start transaction;
+set idreceta=(select codigo from receta where nombre=nom);
+set exito=0;
+if idreceta is not null then 
+delete from receta where codigo=idreceta;
+delete from materiprima_receta where idReceta=idreceta;
+set exito=1;
+set mensaje="se elimino una receta";
+else set exito=0;
+set mensaje="no se pudo eliminar ";
+end if;
+if exito=1 then
+commit;
+else
+rollback;
+end if;
+end
+
+//
+select * from receta;
+select * from materiprima_receta;
+call EliminarReceta( "torta mojada de chocolate",@m);
+select @m;

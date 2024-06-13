@@ -1,5 +1,5 @@
 # ProyectoBaseDeDatos
 Sistema de inventarios para pastelería
-[![proyecto1.jpg](https://i.postimg.cc/gJrPyt09/proyecto1.jpg)](https://postimg.cc/HcGKd253)
+[![PURBLE-PLACE.png](https://i.postimg.cc/kg6mHyc9/PURBLE-PLACE.png)](https://postimg.cc/3kTV4mVb)
 * Ruiz Dafne [https://github.com/TaizRuiz]
 * Loor Paulina
